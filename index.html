@@ -21,6 +21,21 @@
     align-items: center;
     min-height: 100vh;
     padding: 20px;
+    position: relative;
+    z-index: 0;
+  }
+
+  /* Vidéo de fond pleine page, derrière tout */
+  #bg-video {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.5; /* ajuste la transparence si besoin */
   }
 
   h1 {
@@ -288,6 +303,10 @@
 </style>
 </head>
 <body>
+  <video id="bg-video" autoplay muted loop preload="auto" playsinline>
+    <source src="https://cqprsohqkcntkcddlifp.supabase.co/storage/v1/object/public/videos/1754285950223-9nqali5ec7.mp4" type="video/mp4">
+  </video>
+
   <h1>Free Fire Tirage Pro</h1>
 
   <div class="input-section">
@@ -387,48 +406,62 @@
     }
 
     function confirmDraw() {
-      closeModal();
-      if (ids.length === 0) return alert("Ajoute des IDs avant de tirer");
-      let i = 0, s = 100, c = 0, t = 60 + Math.random()*30;
-      function spin() {
-        drawDisplay.textContent = ids[i % ids.length];
-        i++; c++;
-        if (c > t) return drawDisplay.textContent = `🎉 Gagnant: ${ids[(i-1)%ids.length]} 🎉`;
-        if (c > t-10) s += 20;
-        setTimeout(spin, s);
+      if (ids.length === 0) {
+        alert('Ajoutez des IDs avant le tirage.');
+        closeModal();
+        return;
       }
-      spin();
+      closeModal();
+      startDraw();
     }
 
-    searchInput.addEventListener('input', () => {
-      const val = searchInput.value.trim();
-      if (val === '') return updateList();
-      const idx = ids.findIndex(id => id.includes(val));
-      if (idx > -1) {
-        const found = ids.splice(idx, 1)[0];
-        ids.unshift(found);
-        updateList();
-      } else updateList();
-    });
+    function startDraw() {
+      let count = 0;
+      drawDisplay.textContent = '';
+      const interval = setInterval(() => {
+        let randomId = ids[Math.floor(Math.random() * ids.length)];
+        drawDisplay.textContent = randomId;
+        count++;
+        if (count > 30) {
+          clearInterval(interval);
+          alert(`Le gagnant est : ${drawDisplay.textContent}`);
+          highlightWinner(drawDisplay.textContent);
+        }
+      }, 100);
+    }
 
-    function highlightSearch() {
-      const val = searchInput.value.trim();
-      document.querySelectorAll('.id-item').forEach(item => {
-        const txt = item.textContent.replace(/[^0-9]/g, '');
-        item.classList.toggle('highlight', txt.includes(val) && val !== '');
+    function highlightWinner(winner) {
+      let items = document.querySelectorAll('.id-item');
+      items.forEach(item => {
+        if (item.textContent.includes(winner)) {
+          item.classList.add('highlight');
+        } else {
+          item.classList.remove('highlight');
+        }
       });
     }
-
-    noDuplicate.addEventListener('change', () => {
-      if (noDuplicate.checked) {
-        ids = [...new Set(ids)];
-        updateList();
-      }
-    });
 
     function toggleTikTokPanel() {
       tiktokPanel.classList.toggle('show');
     }
+
+    searchInput.addEventListener('input', highlightSearch);
+
+    function highlightSearch() {
+      const term = searchInput.value.trim();
+      let items = document.querySelectorAll('.id-item');
+      items.forEach(item => {
+        if (term === '') {
+          item.style.display = 'flex';
+        } else if (item.textContent.includes(term)) {
+          item.style.display = 'flex';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    }
+
+    updateList();
   </script>
 </body>
 </html>

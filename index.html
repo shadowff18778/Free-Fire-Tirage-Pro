@@ -416,18 +416,21 @@
     }
 
     function startDraw() {
-      let count = 0;
-      drawDisplay.textContent = '';
+      let duration = 10000; // 10 secondes
+      let intervalTime = 50; // vitesse rapide
+      let elapsed = 0;
+
       const interval = setInterval(() => {
         let randomId = ids[Math.floor(Math.random() * ids.length)];
         drawDisplay.textContent = randomId;
-        count++;
-        if (count > 30) {
+        elapsed += intervalTime;
+
+        if (elapsed >= duration) {
           clearInterval(interval);
-          alert(`Le gagnant est : ${drawDisplay.textContent}`);
-          highlightWinner(drawDisplay.textContent);
+          drawDisplay.innerHTML = `<strong>Le gagnant est :</strong> <span style="color:#ff00cc; text-shadow: 0 0 10px #ff00cc;">${randomId}</span>`;
+          highlightWinner(randomId);
         }
-      }, 100);
+      }, intervalTime);
     }
 
     function highlightWinner(winner) {
@@ -441,26 +444,25 @@
       });
     }
 
-    function toggleTikTokPanel() {
-      tiktokPanel.classList.toggle('show');
-    }
-
     searchInput.addEventListener('input', highlightSearch);
-
     function highlightSearch() {
-      const term = searchInput.value.trim();
-      let items = document.querySelectorAll('.id-item');
+      const search = searchInput.value.toLowerCase();
+      const items = document.querySelectorAll('.id-item');
       items.forEach(item => {
-        if (term === '') {
-          item.style.display = 'flex';
-        } else if (item.textContent.includes(term)) {
-          item.style.display = 'flex';
+        const idText = item.textContent.toLowerCase();
+        if (idText.includes(search)) {
+          item.style.display = '';
         } else {
           item.style.display = 'none';
         }
       });
     }
 
+    function toggleTikTokPanel() {
+      tiktokPanel.classList.toggle('show');
+    }
+
+    // Initialisation
     updateList();
   </script>
 </body>

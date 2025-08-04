@@ -4,8 +4,6 @@
   <meta charset="UTF-8">
   <title>Free Fire Tirage Pro</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- ... <head> reste inchangé jusqu'à <style> -->
-
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap');
   * { box-sizing: border-box; }
@@ -25,7 +23,6 @@
     z-index: 0;
   }
 
-  /* Vidéo de fond pleine page, derrière tout */
   #bg-video {
     position: fixed;
     top: 0;
@@ -35,7 +32,7 @@
     object-fit: cover;
     z-index: -1;
     pointer-events: none;
-    opacity: 0.5; /* ajuste la transparence si besoin */
+    opacity: 0.5;
   }
 
   h1 {
@@ -244,7 +241,6 @@
     flex-direction: column;
     gap: 10px;
     z-index: 99;
-
     opacity: 0;
     transform: scale(0.8) translateY(40px);
     transition: all 0.4s ease;
@@ -263,16 +259,6 @@
     0%   { transform: scale(0.8) translateY(40px); opacity: 0; }
     60%  { transform: scale(1.1) translateY(-10px); opacity: 1; }
     100% { transform: scale(1.03) translateY(0); opacity: 1; }
-  }
-
-  .tiktok-btn {
-    background: linear-gradient(135deg, #ff0050, #7f00ff);
-    color: white;
-    padding: 10px 15px;
-    border-radius: 10px;
-    text-align: center;
-    text-decoration: none;
-    font-weight: bold;
   }
 
   .signature {
@@ -299,6 +285,59 @@
     0% { opacity: 0.2; }
     50% { opacity: 1; }
     100% { opacity: 0.2; }
+  }
+
+  /* === Fenêtre de suspension === */
+  .suspension-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(10px);
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 9998;
+    animation: fadeIn 0.5s ease-out;
+  }
+
+  .suspension-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #111;
+    color: #00ffe7;
+    padding: 30px 20px;
+    border-radius: 20px;
+    box-shadow: 0 0 30px #00ffe7;
+    text-align: center;
+    width: 90%;
+    max-width: 400px;
+    z-index: 9999;
+    animation: popIn 0.5s ease-out;
+  }
+
+  .suspension-modal h2 {
+    margin-top: 0;
+    font-size: 1.8rem;
+    text-shadow: 0 0 10px #00ffe7;
+  }
+
+  .suspension-modal .clock {
+    font-size: 1.4rem;
+    margin-top: 15px;
+    color: #ff00cc;
+    text-shadow: 0 0 5px #ff00cc;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes popIn {
+    from { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+    to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
   }
 </style>
 </head>
@@ -349,6 +388,14 @@
   <div class="tiktok-panel" id="tiktokPanel">
     <a href="https://www.tiktok.com/@shadow_ff18" target="_blank" class="tiktok-btn">@shadow_ff18</a>
     <a href="https://www.tiktok.com/@ff.greedo" target="_blank" class="tiktok-btn">@ff.greedo</a>
+  </div>
+
+  <!-- Bloc de suspension -->
+  <div class="suspension-overlay"></div>
+  <div class="suspension-modal">
+    <h2>⚠️ Site suspendu</h2>
+    <p>Ce site a été temporairement suspendu par les développeurs pour des raisons de maintenance ou de sécurité.</p>
+    <div class="clock" id="realtimeClock">--:--:--</div>
   </div>
 
   <script>
@@ -416,8 +463,8 @@
     }
 
     function startDraw() {
-      let duration = 10000; // 10 secondes
-      let intervalTime = 50; // vitesse rapide
+      let duration = 10000;
+      let intervalTime = 50;
       let elapsed = 0;
 
       const interval = setInterval(() => {
@@ -462,7 +509,15 @@
       tiktokPanel.classList.toggle('show');
     }
 
-    // Initialisation
+    // Horloge en temps réel
+    function updateClock() {
+      const clock = document.getElementById('realtimeClock');
+      const now = new Date();
+      clock.textContent = now.toLocaleTimeString('fr-FR', { hour12: false });
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
     updateList();
   </script>
 </body>
